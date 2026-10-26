@@ -1,0 +1,85 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function validSheet(s) {
+      return s is map
+        && s.keys().hasOnly(['marks', 'penalties', 'done'])
+        && s.marks is map
+        && s.marks.keys().hasOnly(['red', 'yellow', 'green', 'blue'])
+        && s.penalties is int && s.penalties >= 0 && s.penalties <= 4
+        && s.done is bool;
+    }
+
+    // Username -> uid, so players can find each other. A username can only be claimed once.
+    match /usernames/{username} {
+      allow get: if signedIn();
+      allow create: if signedIn()
+        && username.matches('^[a-z0-9_]{3,20}$')
+        && request.resource.data.keys().hasOnly(['uid'])
+        && request.resource.data.uid == request.auth.uid
+        && !exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    match /users/{uid} {
+      allow get: if signedIn();
+      allow create: if signedIn() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['name', 'username', 'createdAt'])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() >= 1 && request.resource.data.name.size() <= 30
+        && getAfter(/databases/$(database)/documents/usernames/$(request.resource.data.username)).data.uid == uid;
+    }
+
+    match /games/{gameId} {
+      function isPlayer() {
+        return signedIn() && request.auth.uid in resource.data.players;
+      }
+
+      function otherPlayer() {
+        return resource.data.players[0] == request.auth.uid ? resource.data.players[1] : resource.data.players[0];
+      }
+
+      function validStatusChange() {
+        let before = resource.data.status;
+        let after = request.resource.data.status;
+        let me = request.auth.uid;
+        let sheetsUnchanged = request.resource.data.sheets == resource.data.sheets;
+        return (before == 'pending' && sheetsUnchanged && after in ['active', 'declined'] && me == resource.data.players[1])
+          || (before == 'pending' && sheetsUnchanged && after == 'cancelled' && me == resource.data.players[0])
+          || (before == 'active' && after == 'active')
+          || (before == 'active' && after == 'finished'
+              && request.resource.data.sheets[me].done == true
+              && request.resource.data.sheets[otherPlayer()].done == true)
+          || (before == 'active' && after == 'abandoned' && request.resource.data.abandonedBy == me);
+      }
+
+      allow read: if isPlayer();
+
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['players', 'names', 'createdBy', 'status', 'createdAt', 'updatedAt', 'sheets'])
+        && request.resource.data.players is list
+        && request.resource.data.players.size() == 2
+        && request.resource.data.players[0] == request.auth.uid
+        && request.resource.data.players[1] != request.auth.uid
+        && exists(/databases/$(database)/documents/users/$(request.resource.data.players[1]))
+        && request.resource.data.createdBy == request.auth.uid
+        && request.resource.data.status == 'pending'
+        && validSheet(request.resource.data.sheets[request.resource.data.players[0]])
+        && validSheet(request.resource.data.sheets[request.resource.data.players[1]]);
+
+      // Each player can only change their own sheet.
+      allow update: if isPlayer()
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['sheets', 'status', 'updatedAt', 'finishedAt', 'abandonedBy'])
+        && request.resource.data.sheets.keys().hasOnly(resource.data.players)
+        && request.resource.data.sheets[otherPlayer()] == resource.data.sheets[otherPlayer()]
+        && validSheet(request.resource.data.sheets[request.auth.uid])
+        && validStatusChange();
+    }
+  }
+}
