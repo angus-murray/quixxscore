@@ -515,8 +515,7 @@ export function openGame(id) {
       hideUndo: s.g.status !== "active",
       actionLabel: s.g.status === "active" ? "Abandon" : (s.g.status === "pending" && s.g.players[0] === user.uid ? "Cancel" : null),
       banner: bannerFor(s),
-      opponent: { name: opponentName(s.g), sheet: s.opp, closed: mineClosed },
-      hint: s.playing ? "Tap a number to cross it out. Tap the rightmost cross again to remove it. When your opponent locks a colour, it closes on your sheet too." : ""
+      opponent: { name: opponentName(s.g), sheet: s.opp, closed: mineClosed }
     });
   }
 

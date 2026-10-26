@@ -33,7 +33,7 @@ $("undo").addEventListener("click", function () { call("onUndo"); });
 $("game-action").addEventListener("click", function () { call("onAction"); });
 
 // model: sheet view model plus { undoEnabled, actionLabel, banner: { text, actions: [{ label, run, secondary }] },
-//   opponent: { name, sheet, closed }, hint }
+//   opponent: { name, sheet, closed } }
 function renderGame(model) {
   mySheet.render(model);
   $("undo").disabled = !model.undoEnabled;
@@ -76,8 +76,6 @@ function renderGame(model) {
     $("opp-summary").textContent = opp.name + "’s sheet";
     oppSheet.render({ sheet: opp.sheet, closed: opp.closed });
   }
-
-  $("hint").textContent = model.hint || "";
 }
 
 var ui = {
@@ -177,8 +175,7 @@ function startSolo() {
       undoEnabled: state.history.length > 0,
       actionLabel: "New game",
       banner: reason ? { text: "Game over (" + reason + "). Final score: " + totalScore(state.sheet) } : null,
-      opponent: null,
-      hint: "Tap a number to cross it out. Tap the rightmost cross again to remove it. Tap a lock when another player closes that colour."
+      opponent: null
     });
   }
 

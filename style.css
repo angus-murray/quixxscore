@@ -110,7 +110,7 @@ button { font: inherit; cursor: pointer; }
 }
 .panel h2 { margin: 0 0 6px; font-size: 18px; }
 .panel h3 { margin: 16px 0 6px; font-size: 15px; color: #ccc; }
-.panel p { margin: 0 0 10px; }
+.panel p { margin: 0 0 10px; overflow-wrap: anywhere; }
 .panel > .btn,
 #lobby > .btn { margin-top: 14px; }
 
@@ -418,7 +418,7 @@ input {
 .sheet.compact .legend { display: none; }
 .sheet.compact .bottom { justify-content: flex-end; }
 
-/* Banner and hint */
+/* Banner */
 .banner {
   display: flex;
   flex-wrap: wrap;
@@ -436,13 +436,6 @@ input {
 .banner.won { background: #d1edd6; border-color: var(--green); }
 .banner-actions { display: flex; gap: 8px; }
 .banner-actions:empty { display: none; }
-.hint {
-  margin: 0;
-  color: #aaa;
-  font-size: 13px;
-  text-align: center;
-}
-.hint:empty { display: none; }
 
 /* Narrow portrait phones: give the sheet the full width */
 @media (max-width: 520px) and (orientation: portrait) {

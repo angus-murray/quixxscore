@@ -1,6 +1,6 @@
 {
-  "name": "Qwixx Score Sheet",
-  "short_name": "Qwixx",
+  "name": "QwixxScore",
+  "short_name": "QwixxScore",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#3a3a3a",

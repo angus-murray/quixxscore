@@ -1,6 +1,6 @@
-# Qwixx score sheet
+# QwixxScore
 
-A browser-based Qwixx score sheet that tallies your score as you play. It works on phones (portrait or landscape), tablets and desktop browsers, and has no build step.
+QwixxScore is a browser-based Qwixx score sheet that tallies your score as you play. It works on phones (portrait or landscape), tablets and desktop browsers, and has no build step.
 
 There are two ways to play:
 
@@ -52,7 +52,7 @@ Online play uses Firebase Authentication (Google sign-in) and Cloud Firestore (g
 3. On the Sign-in method tab, under Additional providers, click Google.
 4. Turn on the Enable switch.
 5. Under Support email for project, choose your email address. Google shows this on the sign-in screen.
-6. Leave the public-facing name as it is (or change it to something like `Qwixx`; this is the name players see on Google's sign-in screen) and click Save.
+6. Leave the public-facing name as it is (or change it to something like `QwixxScore`; this is the name players see on Google's sign-in screen) and click Save.
 
 ### 3. Create the database
 
@@ -73,7 +73,7 @@ Online play uses Firebase Authentication (Google sign-in) and Cloud Firestore (g
 
 1. Click Project Overview at the top of the left menu.
 2. Click Add app (or the `</>` web icon under "Get started by adding Firebase to your app").
-3. Enter a nickname such as `Qwixx`. Leave "Also set up Firebase Hosting" unticked. Click Register app.
+3. Enter a nickname such as `QwixxScore`. Leave "Also set up Firebase Hosting" unticked. Click Register app.
 4. Firebase shows some code containing `const firebaseConfig = { ... }`. You need the values for `apiKey`, `authDomain`, `projectId` and `appId`. Click Continue to console when done.
 5. If you lose this page, it is under the gear icon > Project settings > General > Your apps > SDK setup and configuration > Config.
 
