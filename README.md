@@ -35,18 +35,97 @@ then open http://localhost:8000.
 
 ## Setting up online play (Firebase)
 
-Online play uses Firebase Authentication and Cloud Firestore. The free Spark plan is enough.
+Online play uses Firebase Authentication (accounts) and Cloud Firestore (games). The free Spark plan is enough; no billing details are needed. Everything below is done in a web browser. Button names in the Firebase console change from time to time, so a label may differ slightly from what is written here.
 
-1. Create a project at https://console.firebase.google.com.
-2. Build > Authentication > Get started, then enable the Email/Password sign-in provider.
-3. Build > Firestore Database > Create database. Pick a location near you and start in production mode.
-4. Firestore Database > Rules: replace the rules with the contents of `firestore.rules` and publish. (Or run `firebase deploy --only firestore:rules` with the Firebase CLI.)
-5. Project settings > General > Your apps: add a web app and copy its `firebaseConfig` values into `firebase-config.js`.
-6. If you host the app somewhere other than Firebase Hosting, add that domain under Authentication > Settings > Authorized domains (for example `yourname.github.io`).
+### 1. Create the Firebase project
 
-To host on Firebase as well, install the CLI (`npm install -g firebase-tools`), run `firebase login`, `firebase use --add` to pick your project, then `firebase deploy`.
+1. Go to https://console.firebase.google.com and sign in with a Google account.
+2. Click Create a project (or Get started by setting up a Firebase project).
+3. Enter a project name, for example `qwixx-score`, accept the terms and click Continue.
+4. If asked about Gemini in Firebase or Google Analytics, turn them off and continue. Neither is needed.
+5. Click Create project, wait for it to finish, then click Continue. You are now on the project overview page.
 
-Each player creates an account in the app with a name and a unique username. To start a game, enter your opponent's username and tap Challenge. They see the challenge on their home screen the next time they open the app.
+### 2. Turn on email and password sign-in
+
+1. In the left menu, open Build (or All products), then Authentication.
+2. Click Get started.
+3. On the Sign-in method tab, under Native providers, click Email/Password.
+4. Turn on the first switch (Email/Password). Leave Email link (passwordless sign-in) off.
+5. Click Save.
+
+### 3. Create the database
+
+1. In the left menu, open Build, then Firestore Database.
+2. Click Create database.
+3. If asked for an edition, choose Standard. Leave the database ID as `(default)`.
+4. Choose a location close to the players, for example `australia-southeast1 (Sydney)`. This cannot be changed later.
+5. Choose Start in production mode and click Create.
+
+### 4. Add the security rules
+
+1. In Firestore Database, open the Rules tab.
+2. Delete everything in the editor.
+3. Open `firestore.rules` from this repository, copy all of it and paste it into the editor.
+4. Click Publish. Without this step, every online action fails with a "Missing or insufficient permissions" error.
+
+### 5. Register the app and copy its settings
+
+1. Click Project Overview at the top of the left menu.
+2. Click Add app (or the `</>` web icon under "Get started by adding Firebase to your app").
+3. Enter a nickname such as `Qwixx`. Leave "Also set up Firebase Hosting" unticked. Click Register app.
+4. Firebase shows some code containing `const firebaseConfig = { ... }`. You need the values for `apiKey`, `authDomain`, `projectId` and `appId`. Click Continue to console when done.
+5. If you lose this page, it is under the gear icon > Project settings > General > Your apps > SDK setup and configuration > Config.
+
+Now put those values into `firebase-config.js`. On GitHub you can do this in the browser: open the file, click the pencil icon, fill in the four values between the quotes, then click Commit changes. It should end up looking like this (with your own values):
+
+```js
+export var firebaseConfig = {
+  apiKey: "AIzaSyB...",
+  authDomain: "qwixx-score.firebaseapp.com",
+  projectId: "qwixx-score",
+  appId: "1:1234567890:web:abc123..."
+};
+```
+
+Pasting the whole object from Firebase is also fine; the extra fields (`storageBucket`, `messagingSenderId`) are ignored.
+
+### 6. Put the app online
+
+Both players need to open the app from the same web address. Choose one of these.
+
+GitHub Pages (simplest; needs the repository to be public, or a paid GitHub plan for a private one):
+
+1. In the repository on GitHub, go to Settings > Pages.
+2. Under Build and deployment, set Source to Deploy from a branch.
+3. Choose the branch that holds the app (for example `main`) and the `/ (root)` folder, then click Save.
+4. After a minute or two the page shows the address, for example `https://angus-murray.github.io/quixxscore/`.
+5. Back in Firebase, go to Authentication > Settings > Authorized domains, click Add domain and enter `angus-murray.github.io` (no `https://` and no path). Sign-in fails with an "unauthorized domain" error until this is done.
+
+Firebase Hosting (works with a private repository; needs Node.js on your computer):
+
+1. Install Node.js from https://nodejs.org, then in a terminal run `npm install -g firebase-tools`.
+2. Download this repository (Code > Download ZIP on GitHub, then unzip it) and open a terminal in that folder.
+3. Run `firebase login` and sign in with the same Google account.
+4. Run `firebase use --add`, pick your project and give it the alias `default`.
+5. Run `firebase deploy`. This uploads the app and the security rules, and prints the address, for example `https://qwixx-score.web.app`. Firebase Hosting domains are already authorised for sign-in.
+6. Run `firebase deploy` again whenever the app changes.
+
+### 7. Try it
+
+1. Open the address on your phone. The home screen should show Sign in and Create account under Play online. If it says online play is not set up, `firebase-config.js` has not been filled in (or the old version is still cached; reload the page).
+2. Tap Create account and enter your name, a username, your email and a password (at least six characters).
+3. Your opponent does the same on their phone.
+4. Enter their username and tap Challenge. They see it under Challenges for you and tap Accept.
+5. To add the app to the home screen: in Safari, Share > Add to Home Screen; in Chrome, the menu > Add to Home screen.
+
+You can see the accounts in Firebase under Authentication > Users, and the games under Firestore Database > Data.
+
+### Troubleshooting
+
+- "Missing or insufficient permissions": the rules from step 4 have not been published.
+- "auth/operation-not-allowed": Email/Password sign-in is not turned on (step 2).
+- "auth/unauthorized-domain": the app's domain is not in the authorised domains list (step 6).
+- GitHub may email you about an exposed Google API key once `firebase-config.js` is committed. A Firebase web key is meant to be public, so this is expected. To limit it anyway, open https://console.cloud.google.com/apis/credentials (select your project), edit the Browser key, choose Websites under Application restrictions and add your app's address followed by `*` (for example `https://angus-murray.github.io/*`) and `https://<project-id>.firebaseapp.com/*`.
 
 ### Security
 
