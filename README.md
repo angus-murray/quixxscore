@@ -113,7 +113,7 @@ Firebase Hosting (works with a private repository; needs Node.js on your compute
 
 ### 7. Try it
 
-1. Open the address on your phone. The home screen should show Sign in and Create account under Play online. If it says online play is not set up, `firebase-config.js` has not been filled in (or the old version is still cached; reload the page).
+1. Open the address on your phone. The home screen should show a Sign in with Google button under Play online. If it says online play is not set up, `firebase-config.js` has not been filled in (or the old version is still cached; reload the page).
 2. Tap Sign in with Google and choose your Google account.
 3. The first time, choose the name and username other players will see. Your opponent does the same on their phone.
 4. Enter their username and tap Challenge. They see it under Challenges for you and tap Accept.
