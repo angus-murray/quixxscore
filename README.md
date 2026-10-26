@@ -111,6 +111,16 @@ Firebase Hosting (works with a private repository; needs Node.js on your compute
 5. Run `firebase deploy`. This uploads the app and the security rules, and prints the address, for example `https://qwixx-score.web.app`. Firebase Hosting domains are already authorised for sign-in.
 6. Run `firebase deploy` again whenever the app changes.
 
+Vercel (works with a private repository; free Hobby plan; redeploys automatically on every push):
+
+1. Go to https://vercel.com, click Sign Up and continue with GitHub.
+2. Click Add New > Project. If the repository is not listed, click Configure GitHub App (or Adjust GitHub App Permissions) and give Vercel access to it.
+3. Click Import next to the repository.
+4. Set Framework Preset to Other. Leave Root Directory as `./` and leave the build and output settings empty (there is no build step).
+5. Click Deploy. When it finishes, Vercel shows the address, for example `https://quixxscore.vercel.app`.
+6. Vercel publishes the repository's default branch to that address; pushes to other branches get separate preview addresses. To publish a different branch, go to the project's Settings > Git (or Settings > Environments > Production) and change the production branch, then redeploy.
+7. In Firebase, go to Authentication > Settings > Authorized domains, click Add domain and enter the address without `https://`, for example `quixxscore.vercel.app`. Preview addresses are not authorised, so test online play on the main address.
+
 ### 7. Try it
 
 1. Open the address on your phone. The home screen should show a Sign in with Google button under Play online. If it says online play is not set up, `firebase-config.js` has not been filled in (or the old version is still cached; reload the page).
