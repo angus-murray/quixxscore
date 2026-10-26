@@ -5,7 +5,7 @@ A browser-based Qwixx score sheet that tallies your score as you play. It works 
 There are two ways to play:
 
 - Practice: one score sheet on this device, for playing round a table. No account needed.
-- Online: sign in, challenge another player by username, and watch each other's sheets update live. Finished games are kept in your history, with head-to-head records.
+- Online: sign in with Google, challenge another player by username, and watch each other's sheets update live. Finished games are kept in your history, with head-to-head records.
 
 ## Use
 
@@ -35,7 +35,7 @@ then open http://localhost:8000.
 
 ## Setting up online play (Firebase)
 
-Online play uses Firebase Authentication (accounts) and Cloud Firestore (games). The free Spark plan is enough; no billing details are needed. Everything below is done in a web browser. Button names in the Firebase console change from time to time, so a label may differ slightly from what is written here.
+Online play uses Firebase Authentication (Google sign-in) and Cloud Firestore (games). The free Spark plan is enough; no billing details are needed. Everything below is done in a web browser. Button names in the Firebase console change from time to time, so a label may differ slightly from what is written here.
 
 ### 1. Create the Firebase project
 
@@ -45,13 +45,14 @@ Online play uses Firebase Authentication (accounts) and Cloud Firestore (games).
 4. If asked about Gemini in Firebase or Google Analytics, turn them off and continue. Neither is needed.
 5. Click Create project, wait for it to finish, then click Continue. You are now on the project overview page.
 
-### 2. Turn on email and password sign-in
+### 2. Turn on Google sign-in
 
 1. In the left menu, open Build (or All products), then Authentication.
 2. Click Get started.
-3. On the Sign-in method tab, under Native providers, click Email/Password.
-4. Turn on the first switch (Email/Password). Leave Email link (passwordless sign-in) off.
-5. Click Save.
+3. On the Sign-in method tab, under Additional providers, click Google.
+4. Turn on the Enable switch.
+5. Under Support email for project, choose your email address. Google shows this on the sign-in screen.
+6. Leave the public-facing name as it is (or change it to something like `Qwixx`; this is the name players see on Google's sign-in screen) and click Save.
 
 ### 3. Create the database
 
@@ -113,8 +114,8 @@ Firebase Hosting (works with a private repository; needs Node.js on your compute
 ### 7. Try it
 
 1. Open the address on your phone. The home screen should show Sign in and Create account under Play online. If it says online play is not set up, `firebase-config.js` has not been filled in (or the old version is still cached; reload the page).
-2. Tap Create account and enter your name, a username, your email and a password (at least six characters).
-3. Your opponent does the same on their phone.
+2. Tap Sign in with Google and choose your Google account.
+3. The first time, choose the name and username other players will see. Your opponent does the same on their phone.
 4. Enter their username and tap Challenge. They see it under Challenges for you and tap Accept.
 5. To add the app to the home screen: in Safari, Share > Add to Home Screen; in Chrome, the menu > Add to Home screen.
 
@@ -123,8 +124,9 @@ You can see the accounts in Firebase under Authentication > Users, and the games
 ### Troubleshooting
 
 - "Missing or insufficient permissions": the rules from step 4 have not been published.
-- "auth/operation-not-allowed": Email/Password sign-in is not turned on (step 2).
-- "auth/unauthorized-domain": the app's domain is not in the authorised domains list (step 6).
+- "Google sign-in is not turned on in Firebase": step 2 has not been done.
+- Nothing happens when tapping Sign in with Google: the browser may be blocking pop-ups. Allow pop-ups for the app's address and try again.
+- "This web address is not allowed to sign in": the app's domain is not in the authorised domains list (step 6).
 - GitHub may email you about an exposed Google API key once `firebase-config.js` is committed. A Firebase web key is meant to be public, so this is expected. To limit it anyway, open https://console.cloud.google.com/apis/credentials (select your project), edit the Browser key, choose Websites under Application restrictions and add your app's address followed by `*` (for example `https://angus-murray.github.io/*`) and `https://<project-id>.firebaseapp.com/*`.
 
 ### Security

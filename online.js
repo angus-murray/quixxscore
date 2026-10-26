@@ -53,20 +53,16 @@ function notify() {
   listeners.forEach(function (fn) { fn(); });
 }
 
-var PANELS = ["online-off", "online-loading", "auth-form", "profile-form", "lobby"];
+var PANELS = ["online-off", "online-loading", "auth-panel", "profile-form", "lobby"];
 function showPanel(id) {
   PANELS.forEach(function (p) { $(p).hidden = p !== id; });
 }
 
 function friendlyError(e) {
   var messages = {
-    "auth/invalid-credential": "Email or password is incorrect.",
-    "auth/wrong-password": "Email or password is incorrect.",
-    "auth/user-not-found": "Email or password is incorrect.",
-    "auth/invalid-email": "Enter a valid email address.",
-    "auth/missing-password": "Enter your password.",
-    "auth/email-already-in-use": "An account with that email already exists. Sign in instead.",
-    "auth/weak-password": "Use a password of at least six characters.",
+    "auth/unauthorized-domain": "This web address is not allowed to sign in. Add it under Authentication > Settings > Authorized domains in Firebase.",
+    "auth/operation-not-allowed": "Google sign-in is not turned on in Firebase (Authentication > Sign-in method).",
+    "auth/account-exists-with-different-credential": "This email is already linked to another sign-in method.",
     "auth/too-many-requests": "Too many attempts. Try again in a few minutes.",
     "auth/network-request-failed": "No connection. Check your internet and try again.",
     "unavailable": "No connection. Check your internet and try again."
@@ -111,6 +107,7 @@ function onUser(u) {
   if (unsubGames) unsubGames();
   unsubProfile = unsubGames = null;
   authKnown = true;
+  savingProfile = false;
   user = u;
   profile = null;
   profileLoaded = false;
@@ -118,7 +115,8 @@ function onUser(u) {
   gamesLoaded = false;
 
   if (!u) {
-    showPanel("auth-form");
+    $("profile-form").reset();
+    showPanel("auth-panel");
     notify();
     return;
   }
@@ -131,6 +129,8 @@ function onUser(u) {
       renderLobby();
       showPanel("lobby");
     } else if (!savingProfile) {
+      var pf = $("profile-form");
+      if (!pf.name.value && u.displayName) pf.name.value = u.displayName.slice(0, 30);
       showPanel("profile-form");
     }
     notify();
@@ -176,72 +176,18 @@ function saveProfile(name, username) {
 }
 
 function bindForms() {
-  var form = $("auth-form");
-  var mode = "signin";
-
-  function setMode(m) {
-    mode = m;
-    form.classList.toggle("signup", m === "signup");
-    form.querySelectorAll(".tab").forEach(function (t) {
-      t.setAttribute("aria-selected", t.dataset.mode === m ? "true" : "false");
-    });
-    form.querySelector('button[type="submit"]').textContent = m === "signup" ? "Create account" : "Sign in";
-    form.password.autocomplete = m === "signup" ? "new-password" : "current-password";
-    form.querySelector(".error").textContent = "";
-  }
-  form.querySelectorAll(".tab").forEach(function (t) {
-    t.addEventListener("click", function () { setMode(t.dataset.mode); });
-  });
-
-  form.addEventListener("submit", function (e) {
-    e.preventDefault();
-    var error = form.querySelector(".error");
-    var email = form.email.value.trim();
-    var password = form.password.value;
-    var name = form.name.value.trim();
-    var username = form.username.value.trim().toLowerCase();
+  $("google-sign-in").addEventListener("click", function () {
+    var error = $("auth-panel").querySelector(".error");
     error.textContent = "";
-
-    if (mode === "signin") {
-      A.signInWithEmailAndPassword(auth, email, password).catch(function (err) {
-        error.textContent = friendlyError(err);
-      });
-      return;
-    }
-
-    var problem = checkProfileInput(name, username);
-    if (problem) {
-      error.textContent = problem;
-      return;
-    }
-    savingProfile = true;
-    A.createUserWithEmailAndPassword(auth, email, password).then(function () {
-      return saveProfile(name, username);
-    }).catch(function (err) {
-      savingProfile = false;
-      if (user) {
-        // The account exists but the username could not be saved: ask for another.
-        var pf = $("profile-form");
-        pf.name.value = name;
-        pf.username.value = username;
-        pf.querySelector(".error").textContent = friendlyError(err);
-        showPanel("profile-form");
-      } else {
-        error.textContent = friendlyError(err);
+    var provider = new A.GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: "select_account" });
+    A.signInWithPopup(auth, provider).catch(function (err) {
+      if (err.code === "auth/popup-closed-by-user" || err.code === "auth/cancelled-popup-request") return;
+      // Some browsers block pop-ups; sign in by leaving the page and coming back instead.
+      if (err.code === "auth/popup-blocked" || err.code === "auth/operation-not-supported-in-this-environment") {
+        A.signInWithRedirect(auth, provider);
+        return;
       }
-    });
-  });
-
-  $("reset-password").addEventListener("click", function () {
-    var error = form.querySelector(".error");
-    var email = form.email.value.trim();
-    if (!email) {
-      error.textContent = "Enter your email address first.";
-      return;
-    }
-    A.sendPasswordResetEmail(auth, email).then(function () {
-      error.textContent = "Check your email for a link to reset your password.";
-    }, function (err) {
       error.textContent = friendlyError(err);
     });
   });

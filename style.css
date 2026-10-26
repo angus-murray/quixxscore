@@ -127,19 +127,13 @@ input {
   -webkit-user-select: text;
   user-select: text;
 }
-#auth-form:not(.signup) .signup-only,
-#auth-form.signup .signin-only { display: none; }
-.tabs { display: flex; gap: 4px; background: #2a2a2a; border-radius: 9px; padding: 3px; }
-.tab {
-  flex: 1;
-  border: 0;
-  border-radius: 7px;
-  padding: 8px;
-  background: none;
-  color: #bbb;
-  font-weight: 700;
+.btn.google {
+  background: #fff;
+  color: #1f1f1f;
+  gap: 10px;
+  border: 1px solid #dadce0;
 }
-.tab[aria-selected="true"] { background: #555; color: #fff; }
+.btn.google svg { width: 20px; height: 20px; }
 
 .whoami { display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline; }
 .whoami .link { margin-left: auto; }
