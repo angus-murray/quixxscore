@@ -18,7 +18,7 @@
     '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7a5 5 0 0 0-5-5zm-3 5a3 3 0 0 1 6 0v3H9V7z"/></svg>';
 
   function freshState() {
-    var s = { marks: {}, closed: {}, penalties: 0, history: [], enforce: true };
+    var s = { marks: {}, closed: {}, penalties: 0, history: [] };
     COLOURS.forEach(function (c) {
       s.marks[c.key] = new Array(CELLS).fill(false);
       s.closed[c.key] = false; // closed by another player
@@ -35,7 +35,6 @@
       var s = JSON.parse(raw);
       if (!s || !s.marks || !s.closed) return null;
       if (!Array.isArray(s.history)) s.history = [];
-      if (typeof s.enforce !== "boolean") s.enforce = true;
       return s;
     } catch (e) {
       return null;
@@ -89,7 +88,6 @@
 
   function canMark(key, i) {
     if (state.marks[key][i]) return false;
-    if (!state.enforce) return true;
     if (gameOver() || rowClosed(key)) return false;
     if (i <= rightmost(key)) return false;
     if (i === LAST && markCount(key) < MIN_TO_LOCK) return false;
@@ -98,7 +96,6 @@
 
   function canUnmark(key, i) {
     if (!state.marks[key][i]) return false;
-    if (!state.enforce) return true;
     return i === rightmost(key);
   }
 
@@ -132,12 +129,12 @@
   function setPenalty(i) {
     var before = state.penalties;
     if (i < state.penalties) {
-      // Only the most recent penalty can be removed when rules are enforced.
-      if (state.enforce && i !== state.penalties - 1) return;
+      // Only the most recent penalty can be removed.
+      if (i !== state.penalties - 1) return;
       state.penalties = i;
     } else {
-      if (state.enforce && gameOver()) return;
-      state.penalties = state.enforce ? state.penalties + 1 : i + 1;
+      if (gameOver()) return;
+      state.penalties += 1;
     }
     record({ type: "penalty", before: before, after: state.penalties });
     commit();
@@ -154,9 +151,7 @@
 
   function newGame() {
     if (state.history.length && !confirm("Start a new game? The current sheet will be cleared.")) return;
-    var enforce = state.enforce;
     state = freshState();
-    state.enforce = enforce;
     commit();
   }
 
@@ -209,10 +204,10 @@
     var crossesEl = document.getElementById("legend-crosses");
     var pointsEl = document.getElementById("legend-points");
     for (var n = 1; n <= 12; n++) {
-      var a = document.createElement("span");
+      var a = document.createElement("td");
       a.textContent = n + "×";
       crossesEl.appendChild(a);
-      var p = document.createElement("span");
+      var p = document.createElement("td");
       p.textContent = triangular(n);
       pointsEl.appendChild(p);
     }
@@ -232,11 +227,6 @@
 
     document.getElementById("undo").addEventListener("click", undo);
     document.getElementById("new-game").addEventListener("click", newGame);
-    var rules = document.getElementById("rules");
-    rules.addEventListener("change", function () {
-      state.enforce = rules.checked;
-      commit();
-    });
   }
 
   function render() {
@@ -275,7 +265,6 @@
     document.getElementById("total").textContent = total;
 
     document.getElementById("undo").disabled = state.history.length === 0;
-    document.getElementById("rules").checked = state.enforce;
 
     var banner = document.getElementById("banner");
     if (gameOver()) {

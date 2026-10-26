@@ -12,7 +12,6 @@ Open `index.html` directly, or host the folder on any static host (for example G
 - Tap a penalty box for each failed throw (−5 each).
 - Tap the rightmost cross in a row to remove it, or use Undo.
 - The game ends when two colours are closed or four penalties are taken.
-- Untick "Enforce rules" to cross any box freely, for example to copy a paper sheet.
 
 The sheet is saved in the browser, so a refresh or closed tab does not lose the game.
 

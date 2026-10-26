@@ -16,7 +16,6 @@
 <body>
   <header class="toolbar">
     <button id="undo" type="button" disabled>Undo</button>
-    <label class="toggle"><input id="rules" type="checkbox" checked> Enforce rules</label>
     <button id="new-game" type="button">New game</button>
   </header>
 
@@ -24,16 +23,10 @@
     <div class="rows" id="rows"></div>
 
     <div class="bottom">
-      <div class="legend">
-        <div class="legend-row">
-          <span class="legend-label">Crosses</span>
-          <span id="legend-crosses" class="legend-cells"></span>
-        </div>
-        <div class="legend-row">
-          <span class="legend-label">Points</span>
-          <span id="legend-points" class="legend-cells"></span>
-        </div>
-      </div>
+      <table class="legend">
+        <tr id="legend-crosses"><th scope="row">Crosses</th></tr>
+        <tr id="legend-points"><th scope="row">Points</th></tr>
+      </table>
       <div class="penalties">
         <span class="penalty-label">Penalties</span>
         <div class="penalty-boxes" id="penalties"></div>

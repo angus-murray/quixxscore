@@ -57,8 +57,6 @@ button { font: inherit; cursor: pointer; }
   min-height: 36px;
 }
 .toolbar button:disabled { opacity: 0.4; cursor: default; }
-.toggle { display: flex; align-items: center; gap: 6px; }
-.toggle input { width: 18px; height: 18px; }
 
 /* Score sheet */
 .sheet {
@@ -165,29 +163,39 @@ button { font: inherit; cursor: pointer; }
 }
 
 .legend {
+  flex: 1 1 0;
+  min-width: 0;
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
   border: 0.25cqw solid var(--frame);
   border-radius: 1cqw;
   overflow: hidden;
-  flex: 1;
+  table-layout: fixed;
   font-size: 1.9cqw;
   font-weight: 700;
 }
-.legend-row { display: flex; }
-.legend-row + .legend-row { border-top: 0.2cqw solid var(--frame); }
-.legend-label {
+.legend th,
+.legend td {
+  height: 3.6cqw;
+  padding: 0 0.6cqw;
+  vertical-align: middle;
+  line-height: 1;
+}
+.legend th {
   width: 9cqw;
-  padding: 0.6cqw;
   background: var(--frame);
   color: #fff;
-  display: flex;
-  align-items: center;
+  text-align: left;
+  font-weight: 700;
 }
-.legend-cells { flex: 1; display: grid; grid-template-columns: repeat(12, 1fr); }
-.legend-cells span {
+.legend td {
   text-align: center;
-  padding: 0.6cqw 0;
+  padding: 0;
   border-left: 0.15cqw solid #bbb;
 }
+.legend tr + tr th { border-top: 0.15cqw solid #666; }
+.legend tr + tr td { border-top: 0.2cqw solid var(--frame); }
 
 .penalties {
   display: flex;
@@ -280,7 +288,8 @@ button { font: inherit; cursor: pointer; }
   .row { gap: 0.5cqw; padding: 0.7cqw 0.6cqw 0.7cqw 0.3cqw; }
   .cell { font-size: 4.6cqw; }
   .legend, .penalty-label { font-size: 2.6cqw; }
-  .legend-label { width: 13cqw; }
+  .legend th { width: 13cqw; }
+  .legend th, .legend td { height: 5cqw; }
   .bottom { flex-direction: column; gap: 2cqw; }
   .penalties { flex-direction: row; gap: 2cqw; }
   .penalty { width: 9cqw; font-size: 3cqw; }
