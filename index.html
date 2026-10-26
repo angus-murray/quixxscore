@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#3a3a3a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Qwixx">
+  <title>Qwixx Score Sheet</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="toolbar">
+    <button id="undo" type="button" disabled>Undo</button>
+    <label class="toggle"><input id="rules" type="checkbox" checked> Enforce rules</label>
+    <button id="new-game" type="button">New game</button>
+  </header>
+
+  <main class="sheet" id="sheet">
+    <div class="rows" id="rows"></div>
+
+    <div class="bottom">
+      <div class="legend">
+        <div class="legend-row">
+          <span class="legend-label">Crosses</span>
+          <span id="legend-crosses" class="legend-cells"></span>
+        </div>
+        <div class="legend-row">
+          <span class="legend-label">Points</span>
+          <span id="legend-points" class="legend-cells"></span>
+        </div>
+      </div>
+      <div class="penalties">
+        <span class="penalty-label">Penalties</span>
+        <div class="penalty-boxes" id="penalties"></div>
+      </div>
+    </div>
+
+    <div class="totals">
+      <div class="total-box red"><span class="total-tag">Red</span><output id="total-red">0</output></div>
+      <span class="op">+</span>
+      <div class="total-box yellow"><span class="total-tag">Yellow</span><output id="total-yellow">0</output></div>
+      <span class="op">+</span>
+      <div class="total-box green"><span class="total-tag">Green</span><output id="total-green">0</output></div>
+      <span class="op">+</span>
+      <div class="total-box blue"><span class="total-tag">Blue</span><output id="total-blue">0</output></div>
+      <span class="op">&minus;</span>
+      <div class="total-box penalty-total"><span class="total-tag">Penalties</span><output id="total-penalty">0</output></div>
+      <span class="op">=</span>
+      <div class="total-box grand"><span class="total-tag">Total</span><output id="total">0</output></div>
+    </div>
+  </main>
+
+  <div class="banner" id="banner" hidden></div>
+
+  <p class="hint">Tap a number to cross it out. Tap the rightmost cross again to remove it. Tap a lock when another player closes that colour.</p>
+
+  <script src="app.js"></script>
+</body>
+</html>

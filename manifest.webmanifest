@@ -1,0 +1,9 @@
+{
+  "name": "Qwixx Score Sheet",
+  "short_name": "Qwixx",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#3a3a3a",
+  "theme_color": "#3a3a3a",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}
